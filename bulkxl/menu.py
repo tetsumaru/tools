@@ -1,4 +1,5 @@
 import tkinter
+import create_list
 
 
 def createGui():
@@ -38,7 +39,8 @@ def createGui():
     header_record_text_box.insert(tkinter.END, u'0')
     header_record_text_box.place(x=5, y=220)
 
-    get_button = tkinter.Button(text='取得', width=10)
+    get_button = tkinter.Button(text='取得', width=10, command=lambda: create_list.execute(
+        target_dir_text_box.get(), exclusion_dir_text_box.get(), target_sheet_text_box.get(), work_file_text_box.get(), header_record_text_box.get()))
     get_button.place(x=5, y=250)
 
     update_button = tkinter.Button(text='更新', width=10)
