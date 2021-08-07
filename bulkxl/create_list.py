@@ -41,6 +41,8 @@ def execute(target_dir, exclusion_dir, sheet_name, work_file, header_record):
 
 def copying_record(new_work_sheet, record_count, record):
     for cell in record:
+        new_work_sheet.cell(record_count, cell.column +
+                            3).alignment = openpyxl.styles.Alignment(wrapText=True)
         new_work_sheet.cell(record_count, cell.column+3).value = cell.value
 
 
