@@ -14,17 +14,18 @@ def execute(target_dir, exclusion_dir, sheet_name, work_file, header_record):
         work_sheet = work_book[sheet_name]
         if not is_configured_header:
             for header in work_sheet.iter_rows(min_row=header_record, max_row=header_record):
-                for cell in header:
-                    new_work_sheet.cell(
-                        record_count, cell.column+3).value = cell.value
+                copying_record(new_work_sheet, record_count, header)
                 record_count += 1
             is_configured_header = True
         for record in work_sheet.iter_rows(min_row=header_record+1, max_col=work_sheet.max_column):
-            for cell in record:
-                new_work_sheet.cell(
-                    record_count, cell.column+3).value = cell.value
+            copying_record(new_work_sheet, record_count, record)
             record_count += 1
     new_work_book.save(work_file)
+
+
+def copying_record(new_work_sheet, record_count, record):
+    for cell in record:
+        new_work_sheet.cell(record_count, cell.column+3).value = cell.value
 
 
 target_dir = "C:/Users/tnaka/OneDrive/デスクトップ/hoge/"
