@@ -2,7 +2,7 @@ import tkinter
 import create_list
 
 
-def createGui():
+def create_menu():
     root = tkinter.Tk()
     root.title("bulkxl")
     root.geometry("400x300")
@@ -49,4 +49,4 @@ def createGui():
     root.mainloop()
 
 
-createGui()
+create_menu()
