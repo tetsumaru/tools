@@ -3,7 +3,7 @@ import tkinter
 def createGui():
     root = tkinter.Tk()
     root.title("bulkxl")
-    root.geometry("400x250")
+    root.geometry("400x300")
 
     target_dir_rable = tkinter.Label(root, text="対象ディレクトリ(フルパス)")
     target_dir_rable.place(x=5,y=0) 
@@ -30,11 +30,18 @@ def createGui():
     work_file_text_box.insert(tkinter.END, u'C:\\temp.xlsx') 
     work_file_text_box.place(x=5,y=170)
 
+    header_record_rabel  = tkinter.Label(root, text="ヘッダー行")
+    header_record_rabel.place(x=5,y=200) 
+    header_record_text_box = tkinter.Entry()
+    header_record_text_box.configure(state='normal', width=10)
+    header_record_text_box.insert(tkinter.END, u'0') 
+    header_record_text_box.place(x=5,y=220)
+
     get_button = tkinter.Button(text='取得', width=10)
-    get_button.place(x=5, y=200)
+    get_button.place(x=5, y=250)
 
     update_button = tkinter.Button(text='更新', width=10)
-    update_button.place(x=105, y=200)
+    update_button.place(x=105, y=250)
 
     root.mainloop()
 
