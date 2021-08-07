@@ -12,12 +12,15 @@ def execute(target_dir, exclusion_dir, sheet_name, work_file, header_record):
     for excel_file_path in list:
         work_book = openpyxl.load_workbook(excel_file_path)
         work_sheet = work_book[sheet_name]
+        target_record_list = [
+            cell.row for cell in work_sheet["A:A"] if cell.value is not None]
+        a_max_row = max(target_record_list, key=lambda record: record)
         if not is_configured_header:
             for header in work_sheet.iter_rows(min_row=header_record, max_row=header_record):
                 copying_record(new_work_sheet, record_count, header)
                 record_count += 1
             is_configured_header = True
-        for record in work_sheet.iter_rows(min_row=header_record+1, max_col=work_sheet.max_column):
+        for record in work_sheet.iter_rows(min_row=header_record+1, max_row=a_max_row,  max_col=work_sheet.max_column):
             copying_record(new_work_sheet, record_count, record)
             record_count += 1
     new_work_book.save(work_file)
