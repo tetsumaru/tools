@@ -23,6 +23,7 @@ def execute(target_dir, exclusion_dir, sheet_name, work_file, header_record):
                 new_work_sheet.cell(record_count, 1).value = 'No'
                 new_work_sheet.cell(record_count, 2).value = 'Path'
                 new_work_sheet.cell(record_count, 3).value = 'ファイル名'
+
                 copying_record(new_work_sheet, record_count, header)
                 record_count += 1
             is_configured_header = True
@@ -34,6 +35,7 @@ def execute(target_dir, exclusion_dir, sheet_name, work_file, header_record):
             new_work_sheet.cell(
                 record_count, 2).value = os.path.dirname(path_file)
             new_work_sheet.cell(record_count, 3).value = path_file.name
+            new_work_sheet.cell(record_count, 3).hyperlink = excel_file_path
             copying_record(new_work_sheet, record_count, record)
             record_count += 1
     new_work_book.save(work_file)
