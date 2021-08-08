@@ -1,5 +1,6 @@
 import tkinter
 import create_list
+import apply_update
 
 
 def create_menu():
@@ -40,10 +41,11 @@ def create_menu():
     header_record_text_box.place(x=5, y=220)
 
     get_button = tkinter.Button(text='取得', width=10, command=lambda: create_list.execute(
-        target_dir_text_box.get(), exclusion_dir_text_box.get(), target_sheet_text_box.get(), work_file_text_box.get(), header_record_text_box.get()))
+        target_dir_text_box.get(), exclusion_dir_text_box.get(), target_sheet_text_box.get(), work_file_text_box.get(), int(header_record_text_box.get())))
     get_button.place(x=5, y=250)
 
-    update_button = tkinter.Button(text='更新', width=10)
+    update_button = tkinter.Button(text='更新', width=10, command=lambda: apply_update.execute(
+        target_sheet_text_box.get(), work_file_text_box.get(), int(header_record_text_box.get())))
     update_button.place(x=105, y=250)
 
     root.mainloop()

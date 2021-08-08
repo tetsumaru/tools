@@ -43,11 +43,3 @@ def copying_record(new_work_sheet, record_count, record):
         new_work_sheet.cell(record_count, cell.column +
                             2).alignment = openpyxl.styles.Alignment(wrapText=True)
         new_work_sheet.cell(record_count, cell.column+2).value = cell.value
-
-
-target_dir = "C:/Users/tnaka/OneDrive/デスクトップ/hoge/"
-exclusion_dir = '対象外,たいしょうがい'
-sheet_name = 'hoge'
-work_file = 'C:/Users/tnaka/OneDrive/デスクトップ/temp.xlsx'
-header_record = 2
-execute(target_dir, exclusion_dir, sheet_name, work_file, header_record)
