@@ -21,12 +21,14 @@ def execute(sheet_name, work_file, header_record):
             delete_count = len(target_list)+header_record - a_max_row
             target_work_sheet.delete_rows(
                 idx=header_record+1, amount=delete_count)
-            pass
         for index, record in enumerate(target_list):
+            target_work_sheet.row_dimensions[index+header_record +
+                                             1].height = index_work_sheet.row_dimensions[record[0].row].height
             for cell in record[2:]:
                 target_work_sheet.cell(index+header_record+1,
                                        cell.column - 2).value = cell.value
-
                 target_work_sheet.cell(index+header_record+1,
                                        cell.column - 2).font = cell.font._StyleProxy__target
+                target_work_sheet.cell(index+header_record+1,
+                                       cell.column - 2).alignment = cell.alignment._StyleProxy__target
         target_work_book.save(key)
