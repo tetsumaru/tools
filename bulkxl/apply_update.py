@@ -1,6 +1,6 @@
 
 import openpyxl
-
+import copy
 from operator import itemgetter
 from itertools import groupby
 
@@ -28,4 +28,7 @@ def execute(sheet_name, work_file, header_record):
             for cell in record[2:]:
                 target_work_sheet.cell(index+header_record+1,
                                        cell.column - 2).value = cell.value
+
+                target_work_sheet.cell(index+header_record+1,
+                                       cell.column - 2).font = cell.font._StyleProxy__target
         target_work_book.save(key)
