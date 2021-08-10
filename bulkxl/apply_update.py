@@ -7,8 +7,12 @@ def execute(sheet_name, work_file, header_record):
     index_work_book = openpyxl.load_workbook(work_file)
     index_work_sheet = index_work_book[sheet_name]
     for key, record_list in groupby(index_work_sheet.iter_rows(min_row=2), key=lambda record: record[1].value):
-        target_work_book = openpyxl.load_workbook(key)
-        target_work_sheet = target_work_book[sheet_name]
+        try:
+            target_work_book = openpyxl.load_workbook(key)
+            target_work_sheet = target_work_book[sheet_name]
+        except Exception as e:
+            print(e)
+            continue
         target_record_list = [
             cell.row for cell in target_work_sheet["A:A"] if cell.value is not None]
         a_max_row = max(target_record_list, key=lambda record: record)
