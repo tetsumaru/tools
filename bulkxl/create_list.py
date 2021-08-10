@@ -11,8 +11,12 @@ def execute(target_dir, exclusion_dir, sheet_name, work_file, header_record):
     record_count = 1
     is_configured_header = False
     for excel_file_path in target_list:
-        work_book = openpyxl.load_workbook(excel_file_path)
-        work_sheet = work_book[sheet_name]
+        try:
+            work_book = openpyxl.load_workbook(excel_file_path)
+            work_sheet = work_book[sheet_name]
+        except Exception as e:
+            print(e)
+            continue
         target_record_list = [
             cell.row for cell in work_sheet["A:A"] if cell.value is not None]
         a_max_row = max(target_record_list, key=lambda record: record)
