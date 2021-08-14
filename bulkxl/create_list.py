@@ -1,19 +1,21 @@
 
-import openpyxl
+from win32com.client import client
 import search_file
 
 
 def execute(target_dir, exclusion_dir, sheet_name, work_file, header_record):
     target_list = search_file.execute(target_dir, exclusion_dir.split(','))
-    new_work_book = openpyxl.Workbook()
-    new_work_sheet = new_work_book["Sheet"]
-    new_work_sheet.title = sheet_name
+    app = client.Dispatch('Excel.Application')
+    index_wb = app.Workbooks.Add()
+    index_ws = index_wb.Worksheets(1)
+    index_ws.name = sheet_name
     record_count = 1
     is_configured_header = False
     for excel_file_path in target_list:
         try:
-            work_book = openpyxl.load_workbook(excel_file_path)
-            work_sheet = work_book[sheet_name]
+            target_wb = app.add(excel_file_path)
+            target_ws = target_wb.Worksheets(sheet_name)
+            target_ws.Activate()
         except Exception as e:
             print(e)
             continue
