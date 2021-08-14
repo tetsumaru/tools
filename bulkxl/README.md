@@ -7,10 +7,10 @@
 
 ## 使用方法
 ### 前提
-- exe化してない場合、openpyxlがインストールされていること 。<br>
+- exe化してない場合、win32comがインストールされていること 。<br>
   されてない場合は以下のコマンドでインストールする。
 ```
-py -m pip install openpyxl
+python -m pip install pywin32
 ```
 - 取得ボタンおよび更新ボタンを押下する前にExcelファイルが全て閉じていることを確認する。
 
