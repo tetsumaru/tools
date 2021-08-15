@@ -53,7 +53,10 @@ def execute(target_dir, exclusion_file, sheet_name, work_file, header_row, extra
             index_ws.cells(1, 2).value = 'FilePath'
             target_ws.Range(header_range_str).Copy(index_ws.Range('C1'))
             is_configured_header = True
-        index_ws.Hyperlinks.Add(Anchor=index_ws.Range('B{}'.format(record_count)), Address=excel_file_path, ScreenTip=Path(
+        link_range = index_ws.Range('B{}'.format(record_count) + ':' +
+                                    'B{}'.format(record_count + target_last_row - header_row))
+        link_range.value = excel_file_path
+        index_ws.Hyperlinks.Add(Anchor=link_range, Address=excel_file_path, ScreenTip=Path(
             excel_file_path).name, TextToDisplay=Path(excel_file_path).stem)
         range_str = work_sheet_utils.convert_range_str_from_int(
             target_ws, header_row + 1, 1, target_last_row, target_last_column + extra_column_count)
@@ -64,3 +67,7 @@ def execute(target_dir, exclusion_file, sheet_name, work_file, header_row, extra
     index_wb.SaveAs(str(Path(work_file)))
     index_wb.Close(False)
     app.Quit()
+
+
+execute('C:/Users/tnaka/OneDrive/デスクトップ/hoge/', '対象外,taissyogai',
+        'hoge', 'C:/Users/tnaka/OneDrive/デスクトップ/temp2.xlsx', 2)
