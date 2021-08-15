@@ -1,51 +1,66 @@
-
-from win32com.client import client
+import win32com.client
+from pywintypes import com_error
 import search_file
+from pathlib import Path
+import work_sheet_utils
 
 
-def execute(target_dir, exclusion_dir, sheet_name, work_file, header_record):
-    target_list = search_file.execute(target_dir, exclusion_dir.split(','))
-    app = client.Dispatch('Excel.Application')
+def execute(target_dir, exclusion_file, sheet_name, work_file, header_row, extra_column_count=3):
+    """
+    作業用ファイルを作成する。
+    作業用ファイルにはtarget_dirに指定された、ディレクトリ配下のExcelファイルのレコードの一覧が表示される。
+
+    Parameters
+    ----------
+    target_dir : str
+        処理対象のディレクトリのフルパス
+    exclusion_name_list : list
+        処理対象外になる文字列のlist
+    sheet_name : str
+        抽出対象のシート
+    work_file : str
+        作業用ファイルのフルパス
+    header_row : int
+        処理対象のファイルのヘッダーの行数
+    extra_column_count : int ,default 3
+        header_rowより右の列のCellを取得したい場合設定する
+    """
+    target_list = search_file.execute(target_dir, exclusion_file.split(','))
+    app = win32com.client.Dispatch('Excel.Application')
+    app.Visible = False
+    app.DisplayAlerts = False
     index_wb = app.Workbooks.Add()
     index_ws = index_wb.Worksheets(1)
     index_ws.name = sheet_name
-    record_count = 1
+    record_count = 2
     is_configured_header = False
     for excel_file_path in target_list:
         try:
-            target_wb = app.add(excel_file_path)
+            target_wb = app.workbooks.Add(str(Path(excel_file_path)))
             target_ws = target_wb.Worksheets(sheet_name)
             target_ws.Activate()
-        except Exception as e:
+        except com_error as e:
             print(e)
             continue
-        target_record_list = [
-            cell.row for cell in work_sheet["A:A"] if cell.value is not None]
-        a_max_row = max(target_record_list, key=lambda record: record)
+        target_last_column = work_sheet_utils.get_last_column(
+            target_ws, header_row)
+        target_last_row = work_sheet_utils.get_last_row(target_ws, 1)
         if not is_configured_header:
-            for header in work_sheet.iter_rows(min_row=header_record, max_row=header_record):
-                new_work_sheet.cell(record_count, 1).value = 'No'
-                new_work_sheet.cell(record_count, 2).value = 'FilePath'
-                copying_record(new_work_sheet,
-                               record_count, header)
-                record_count += 1
+            # ヘッダーの設定
+            header_range_str = work_sheet_utils.convert_range_str_from_int(
+                target_ws, header_row, 1, header_row, target_last_column)
+            index_ws.cells(1, 1).value = 'No'
+            index_ws.cells(1, 2).value = 'FilePath'
+            target_ws.Range(header_range_str).Copy(index_ws.Range('C1'))
             is_configured_header = True
-        for record in work_sheet.iter_rows(min_row=header_record+1, max_row=a_max_row,  max_col=work_sheet.max_column):
-            new_work_sheet.cell(record_count, 1).value = record_count-1
-            new_work_sheet.cell(record_count, 2).value = excel_file_path
-            new_work_sheet.cell(record_count, 2).hyperlink = excel_file_path
-            new_work_sheet.row_dimensions[record_count].height = work_sheet.row_dimensions[record[0].row].height
-            copying_record(new_work_sheet, record_count, record)
-            record_count += 1
-    new_work_book.save(work_file)
-
-
-def copying_record(new_work_sheet, record_count, record):
-    for cell in record:
-        new_work_sheet.cell(record_count, cell.column +
-                            2).alignment = openpyxl.styles.Alignment(wrapText=True)
-        new_work_sheet.cell(record_count, cell.column+2).value = cell.value
-        new_work_sheet.cell(record_count, cell.column +
-                            2).font = cell.font._StyleProxy__target
-        new_work_sheet.cell(record_count, cell.column +
-                            2).alignment = cell.alignment._StyleProxy__target
+        index_ws.Hyperlinks.Add(Anchor=index_ws.Range('B{}'.format(record_count)), Address=excel_file_path, ScreenTip=Path(
+            excel_file_path).name, TextToDisplay=Path(excel_file_path).stem)
+        range_str = work_sheet_utils.convert_range_str_from_int(
+            target_ws, header_row + 1, 1, target_last_row, target_last_column + extra_column_count)
+        target_ws.Range(range_str).Copy(
+            index_ws.Range('C{}'.format(record_count)))
+        record_count += target_last_row - header_row
+        target_wb.Close(False)
+    index_wb.SaveAs(str(Path(work_file)))
+    index_wb.Close(False)
+    app.Quit()
