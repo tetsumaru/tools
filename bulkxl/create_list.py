@@ -54,7 +54,7 @@ def execute(target_dir, exclusion_file, sheet_name, work_file, header_row, extra
             target_ws.Range(header_range_str).Copy(index_ws.Range('C1'))
             is_configured_header = True
         link_range = index_ws.Range('B{}'.format(record_count) + ':' +
-                                    'B{}'.format(record_count + target_last_row - header_row))
+                                    'B{}'.format(record_count + target_last_row - header_row-1))
         link_range.value = excel_file_path
         index_ws.Hyperlinks.Add(Anchor=link_range, Address=excel_file_path, ScreenTip=Path(
             excel_file_path).name, TextToDisplay=Path(excel_file_path).stem)

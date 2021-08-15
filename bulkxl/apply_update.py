@@ -1,38 +1,47 @@
 
-import openpyxl
+import win32com.client
+from pywintypes import com_error
 from itertools import groupby
+from pathlib import Path
+import work_sheet_utils
 
 
-def execute(sheet_name, work_file, header_record):
-    index_work_book = openpyxl.load_workbook(work_file)
-    index_work_sheet = index_work_book[sheet_name]
-    for key, record_list in groupby(index_work_sheet.iter_rows(min_row=2), key=lambda record: record[1].value):
+def execute(sheet_name, work_file, header_row, extra_column_count=3):
+    app = win32com.client.Dispatch('Excel.Application')
+    app.Visible = False
+    app.DisplayAlerts = False
+    index_wb = app.Workbooks.Add(str(Path(work_file)))
+    index_ws = index_wb.Worksheets(sheet_name)
+    record_count = 2
+    index_B_last_row = work_sheet_utils.get_last_row(index_ws, 2)
+    index_last_column = work_sheet_utils.get_last_column(
+        index_ws, header_row)
+    target_file_list = [cell for cell in index_ws.Range(
+        'B2:B{}'.format(index_B_last_row))]
+
+    for key, record_list in groupby(target_file_list, key=lambda record: record[0].value):
+        index_record_count = len(tuple(record_list))
         try:
-            target_work_book = openpyxl.load_workbook(key)
-            target_work_sheet = target_work_book[sheet_name]
-        except Exception as e:
+            target_app = win32com.client.Dispatch('Excel.Application')
+            target_app.Visible = False
+            target_app.DisplayAlerts = False
+            target_wb = target_app.workbooks.Add(str(Path(key)))
+            target_ws = target_wb.Worksheets(sheet_name)
+            target_ws.Activate()
+            index_range_str = work_sheet_utils.convert_range_str_from_int(
+                target_ws, record_count, 3, record_count + index_record_count-1, index_last_column + extra_column_count)
+            print(index_range_str)
+            index_ws.Range(index_range_str).Copy(
+                target_ws.Range('A{}'.format(header_row+1)))
+            print(key)
+            target_wb.SaveAs(str(Path(key)))
+            target_app.DisplayAlerts = True
+        except com_error as e:
             print(e)
             continue
-        target_record_list = [
-            cell.row for cell in target_work_sheet["A:A"] if cell.value is not None]
-        a_max_row = max(target_record_list, key=lambda record: record)
-        target_list = list(record_list)
-        if len(target_list)+header_record > a_max_row:
-            insert_count = len(target_list)+header_record - a_max_row
-            for i in range(0, insert_count):
-                target_work_sheet.insert_rows(a_max_row)
-        if len(target_list)+header_record < a_max_row:
-            delete_count = len(target_list)+header_record - a_max_row
-            target_work_sheet.delete_rows(
-                idx=header_record+1, amount=delete_count)
-        for index, record in enumerate(target_list):
-            target_work_sheet.row_dimensions[index+header_record +
-                                             1].height = index_work_sheet.row_dimensions[record[0].row].height
-            for cell in record[2:]:
-                target_work_sheet.cell(index+header_record+1,
-                                       cell.column - 2).value = cell.value
-                target_work_sheet.cell(index+header_record+1,
-                                       cell.column - 2).font = cell.font._StyleProxy__target
-                target_work_sheet.cell(index+header_record+1,
-                                       cell.column - 2).alignment = cell.alignment._StyleProxy__target
-        target_work_book.save(key)
+        finally:
+            record_count += index_record_count
+            target_wb.Close(False)
+
+
+execute('hoge', 'C:/Users/tnaka/OneDrive/デスクトップ/temp2.xlsx', 2)
