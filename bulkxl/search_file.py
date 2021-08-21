@@ -9,3 +9,6 @@ def execute(target_der, exclusion_dir_list):
 
 def is_target_dir(file_path, exclusion_dir_list):
     return not any(e in file_path for e in exclusion_dir_list)
+
+
+

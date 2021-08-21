@@ -42,6 +42,3 @@ def execute(sheet_name, work_file, header_row, extra_column_count=3):
         finally:
             record_count += index_record_count
             target_wb.Close(False)
-
-
-execute('hoge', 'C:/Users/tnaka/OneDrive/デスクトップ/temp2.xlsx', 2)

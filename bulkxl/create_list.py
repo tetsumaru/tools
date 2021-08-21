@@ -36,6 +36,9 @@ def execute(target_dir, exclusion_file, sheet_name, work_file, header_row, extra
     is_configured_header = False
     for excel_file_path in target_list:
         try:
+            target_app = win32com.client.Dispatch('Excel.Application')
+            target_app.Visible = False
+            target_app.DisplayAlerts = False
             target_wb = app.workbooks.Add(str(Path(excel_file_path)))
             target_ws = target_wb.Worksheets(sheet_name)
             target_ws.Activate()
@@ -63,11 +66,9 @@ def execute(target_dir, exclusion_file, sheet_name, work_file, header_row, extra
         target_ws.Range(range_str).Copy(
             index_ws.Range('C{}'.format(record_count)))
         record_count += target_last_row - header_row
+        target_app.DisplayAlerts = True
         target_wb.Close(False)
     index_wb.SaveAs(str(Path(work_file)))
     index_wb.Close(False)
+    app.DisplayAlerts = True
     app.Quit()
-
-
-execute('C:/Users/tnaka/OneDrive/デスクトップ/hoge/', '対象外,taissyogai',
-        'hoge', 'C:/Users/tnaka/OneDrive/デスクトップ/temp2.xlsx', 2)
